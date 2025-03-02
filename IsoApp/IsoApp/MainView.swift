@@ -18,9 +18,21 @@ struct ContentView: View {
     //Define variables for the chart
     @State var data = [
         painDataPoint(dateForPlot: "MACRCH 5", painForPlot: 4),
-        painDataPoint(dateForPlot: "MACRCH 6", painForPlot: 10)]
-    let graphSizes = ["3", "7", "30", "90", "365", "All"]
-    @State var graphSize = 3
+        painDataPoint(dateForPlot: "MACRCH 6", painForPlot: 10),
+        painDataPoint(dateForPlot: "MACRCH 7", painForPlot: 6),
+        painDataPoint(dateForPlot: "MACRCH 8", painForPlot: 1),
+        painDataPoint(dateForPlot: "MACRCH 9", painForPlot: 7),
+        painDataPoint(dateForPlot: "MACRCH 10", painForPlot: 5),
+        painDataPoint(dateForPlot: "MACRCH 11", painForPlot: 4),]
+    enum graphSizes: String, CaseIterable{
+        case three = "3"
+        case seven = "7"
+        case thirty = "30"
+        case ninety = "90"
+        case year = "365"
+        case all = "All"
+    }
+    @State var graphSize: graphSizes = .three
     
     //Define variables for the Pain Tracking page
     @State var textToDisplayInPainTrackingInputField = "Enter pain level, 1-10"
@@ -52,12 +64,21 @@ struct ContentView: View {
                             .font(.title)
                             .bold()
                         Chart{
-                            ForEach(data) { d in
+                            ForEach(filteredData) { d in
                                 LineMark(x: PlottableValue.value("Day", d.dateForPlot), y: .value("Pain level", d.painForPlot))
                                     .interpolationMethod(.catmullRom)
                             }
                         }
-                        Text("Settings")
+                        
+                        Text("Graph size")
+                            .foregroundColor(.secondary)
+                        Picker("Select graph size", selection: $graphSize){
+                            ForEach(graphSizes.allCases, id: \.self){ size in
+                                Text(size.rawValue)
+                            }
+                        }
+                        .pickerStyle(.segmented)
+                        .padding(.horizontal, 20)
                         Spacer()
                             .frame(height: 80)
                     }
@@ -173,6 +194,26 @@ struct ContentView: View {
             
             }
             
+        }
+    
+    //filter data
+    var filteredData: [painDataPoint] {
+        let count: Int
+        switch graphSize {
+        case .three:
+            count = 3
+        case .seven:
+            count = 7
+        case .thirty:
+            count = 30
+        case .ninety:
+            count = 90
+        case .year:
+            count = 365
+        case .all:
+            count = data.count
+        }
+        return Array(data.suffix(count))
         }
     
     //Functions for settings page
