@@ -19,6 +19,8 @@ struct ContentView: View {
     @State var data = [
         painDataPoint(dateForPlot: "MACRCH 5", painForPlot: 4),
         painDataPoint(dateForPlot: "MACRCH 6", painForPlot: 10)]
+    let graphSizes = ["3", "7", "30", "90", "365", "All"]
+    @State var graphSize = 3
     
     //Define variables for the Pain Tracking page
     @State var textToDisplayInPainTrackingInputField = "Enter pain level, 1-10"
@@ -28,7 +30,7 @@ struct ContentView: View {
     @State var currentDate = Date()
     
     //Define variables for the Timer page
-    @State var timerDuration = 5
+    @State var timerDuration = 45
     @State var timerRunning = false
     let timer = Timer.publish(every: 1, on: .main, in: .common).autoconnect()
     
@@ -41,11 +43,23 @@ struct ContentView: View {
             //Set up the Home page
             NavigationView {
                 VStack{
-                    Chart{
-                        ForEach(data) { d in
-                            LineMark(x: PlottableValue.value("Day", d.dateForPlot), y: .value("Pain level", d.painForPlot))
-                                .interpolationMethod(.catmullRom)
+                    if data.count < 1{
+                        Text("Not enough data to display graph")
+                    } else {
+                        Spacer()
+                            .frame(height: 60)
+                        Text("Pain history graph")
+                            .font(.title)
+                            .bold()
+                        Chart{
+                            ForEach(data) { d in
+                                LineMark(x: PlottableValue.value("Day", d.dateForPlot), y: .value("Pain level", d.painForPlot))
+                                    .interpolationMethod(.catmullRom)
+                            }
                         }
+                        Text("Settings")
+                        Spacer()
+                            .frame(height: 80)
                     }
                 }
                 .navigationTitle("Iso App")
@@ -79,10 +93,19 @@ struct ContentView: View {
                             .font(.title)
                             .bold()
                         
-                        List(formerPainLevels, id: \.self) { item in
-                            Text("\(currentDate, formatter: dateFormatter): \(item)") // Display each integer in the array on a new line
+                        
+                        
+                        List {
+                            Button(action: clearPainHistory){
+                                Text("Clear all history")
+                                    .foregroundColor(.red)
+                            }
+                            
+                            ForEach(formerPainLevels, id: \.self) { item in
+                                Text("\(currentDate, formatter: dateFormatter): \(item)") // Display each integer in the array on a new line
+                            }
+                            .frame(maxWidth: .infinity, alignment: .leading)
                         }
-                        .frame(maxWidth: .infinity)
                         
                     }
                     
@@ -174,6 +197,11 @@ struct ContentView: View {
                 textToDisplayInPainTrackingInputField = "Please enter a valid number, 1-10"
                 
             }
+    }
+    
+    func clearPainHistory(){
+        formerPainLevels = []
+        data = []
     }
     
     // Custom date formatter to display the date in a readable format
