@@ -6,13 +6,26 @@
 //
 
 import SwiftUI
+import Charts
+
+struct painDataPoint: Identifiable{
+    var id = UUID().uuidString
+    @State var dateForPlot: String
+    @State var painForPlot: Int
+}
 
 struct ContentView: View {
+    //Define variables for the chart
+    @State var data = [
+        painDataPoint(dateForPlot: "MACRCH 5", painForPlot: 4),
+        painDataPoint(dateForPlot: "MACRCH 6", painForPlot: 10)]
+    
     //Define variables for the Pain Tracking page
     @State var textToDisplayInPainTrackingInputField = "Enter pain level, 1-10"
     @State var todaysPainLevel: String = ""
     @State var painLevelInt: Int?
     @State var formerPainLevels: [Int] = []
+    @State var currentDate = Date()
     
     //Define variables for the Timer page
     @State var timerDuration = 5
@@ -28,7 +41,12 @@ struct ContentView: View {
             //Set up the Home page
             NavigationView {
                 VStack{
-                    Text("Graph goes here")
+                    Chart{
+                        ForEach(data) { d in
+                            LineMark(x: PlottableValue.value("Day", d.dateForPlot), y: .value("Pain level", d.painForPlot))
+                                .interpolationMethod(.catmullRom)
+                        }
+                    }
                 }
                 .navigationTitle("Iso App")
             }
@@ -40,10 +58,11 @@ struct ContentView: View {
             //Set up the Pain Tracking page
             NavigationView {
                 VStack{
-                    Form{
+                 
                         VStack(alignment: .leading) {
                             Text("Today's Pain Level")
-                                .font(.headline)
+                                .font(.title)
+                                .bold()
                             TextField(textToDisplayInPainTrackingInputField, text: $todaysPainLevel)
                                 .keyboardType(.numberPad)
                                 .textFieldStyle(RoundedBorderTextFieldStyle())
@@ -51,11 +70,26 @@ struct ContentView: View {
                                 Text("Submit")
                             }
                         }
+                        .padding(20)
+                    
+                    VStack {
+                        Text("History")
+                            .frame(maxWidth: .infinity, alignment: .leading)
+                            .padding(20)
+                            .font(.title)
+                            .bold()
+                        
+                        List(formerPainLevels, id: \.self) { item in
+                            Text("\(currentDate, formatter: dateFormatter): \(item)") // Display each integer in the array on a new line
+                        }
+                        .frame(maxWidth: .infinity)
+                        
                     }
                     
-                    Text("\(formerPainLevels)")
-                    
                 }
+                .frame(maxHeight: .infinity, alignment: .top)
+                
+                
                 .navigationTitle("Pain Tracking")
             }
             .tabItem{
@@ -77,6 +111,7 @@ struct ContentView: View {
                                     timerDuration -= 1
                                 } else{
                                     timerRunning = false
+                                    timerDuration = Int(isoDurationInput) ?? 0
                                 }
                             }
                             .font(.system(size: 80, weight: .bold))
@@ -129,13 +164,25 @@ struct ContentView: View {
                 painLevelInt = testnum
                 textToDisplayInPainTrackingInputField = "Enter pain level, 1-10"
                 formerPainLevels.append(painLevelInt ?? 0)
-                print(formerPainLevels)
+            
+                //do stuff for graph
+                //convert date to string
+            
+            data.append(painDataPoint(dateForPlot: dateFormatter.string(from: currentDate), painForPlot: painLevelInt ?? 0))
             } else {
                 todaysPainLevel = ""
                 textToDisplayInPainTrackingInputField = "Please enter a valid number, 1-10"
                 
             }
     }
+    
+    // Custom date formatter to display the date in a readable format
+        private var dateFormatter: DateFormatter {
+            let formatter = DateFormatter()
+            formatter.dateStyle = .medium
+            formatter.timeStyle = .none
+            return formatter
+        }
     
     }
 
