@@ -15,6 +15,9 @@ struct painDataPoint: Identifiable{
 }
 
 struct ContentView: View {
+    //Define miscellaneus variables
+    @State var selectedTab = 0
+    
     //Define variables for the chart
     @State var data = [
         painDataPoint(dateForPlot: "MACRCH 5", painForPlot: 4),
@@ -25,37 +28,39 @@ struct ContentView: View {
         painDataPoint(dateForPlot: "MACRCH 10", painForPlot: 5),
         painDataPoint(dateForPlot: "MACRCH 11", painForPlot: 4),]
     enum graphSizes: String, CaseIterable{
+        case all = "All"
         case three = "3"
         case seven = "7"
         case thirty = "30"
         case ninety = "90"
         case year = "365"
-        case all = "All"
     }
     @State var graphSize: graphSizes = .three
+    @State var graphSizeInt: Int?
     
     //Define variables for the Pain Tracking page
     @State var textToDisplayInPainTrackingInputField = "Enter pain level, 1-10"
-    @State var todaysPainLevel: String = ""
+    @State var todaysPainLevel: Double = 1.0
     @State var painLevelInt: Int?
     @State var formerPainLevels: [Int] = []
     @State var currentDate = Date()
     
     //Define variables for the Timer page
-    @State var timerDuration = 45
+    @State var timerDuration: Int = 45
     @State var timerRunning = false
     let timer = Timer.publish(every: 1, on: .main, in: .common).autoconnect()
+    @State var tabSwitchingAllowed = true
     
     //Define variables for the Settings page
-    @State var isoDurationInput: String = ""
+    @State var isoDurationInput: Double = 45
     
     var body: some View {
-        TabView{
+        TabView(selection: $selectedTab){
             
             //Set up the Home page
             NavigationView {
                 VStack{
-                    if data.count < 1{
+                    if data.count < 3 {
                         Text("Not enough data to display graph")
                     } else {
                         Spacer()
@@ -72,15 +77,60 @@ struct ContentView: View {
                         
                         Text("Graph size")
                             .foregroundColor(.secondary)
-                        Picker("Select graph size", selection: $graphSize){
-                            ForEach(graphSizes.allCases, id: \.self){ size in
-                                Text(size.rawValue)
+                        
+                        if data.count < 3{
+                            Text("Not enough data to display graph")
+                        } else if data.count > 2 && data.count <= 6{
+                            Picker("Select graph size", selection: $graphSize){
+                                ForEach(graphSizes.allCases.prefix(2), id: \.self){ size in
+                                    Text(size.rawValue)
+                                }
                             }
+                            .pickerStyle(.segmented)
+                            .padding(.horizontal, 20)
+                            Spacer()
+                                .frame(height: 80)
+                        } else if data.count > 6 && data.count <= 29{
+                            Picker("Select graph size", selection: $graphSize){
+                                ForEach(graphSizes.allCases.prefix(3), id: \.self){ size in
+                                    Text(size.rawValue)
+                                }
+                            }
+                            .pickerStyle(.segmented)
+                            .padding(.horizontal, 20)
+                            Spacer()
+                                .frame(height: 80)
+                        } else if data.count > 29 && data.count <= 89{
+                            Picker("Select graph size", selection: $graphSize){
+                                ForEach(graphSizes.allCases.prefix(4), id: \.self){ size in
+                                    Text(size.rawValue)
+                                }
+                            }
+                            .pickerStyle(.segmented)
+                            .padding(.horizontal, 20)
+                            Spacer()
+                                .frame(height: 80)
+                        } else if data.count > 89 && data.count <= 364{
+                            Picker("Select graph size", selection: $graphSize){
+                                ForEach(graphSizes.allCases.prefix(5), id: \.self){ size in
+                                    Text(size.rawValue)
+                                }
+                            }
+                            .pickerStyle(.segmented)
+                            .padding(.horizontal, 20)
+                            Spacer()
+                                .frame(height: 80)
+                        } else if data.count > 364{
+                            Picker("Select graph size", selection: $graphSize){
+                                ForEach(graphSizes.allCases, id: \.self){ size in
+                                    Text(size.rawValue)
+                                }
+                            }
+                            .pickerStyle(.segmented)
+                            .padding(.horizontal, 20)
+                            Spacer()
+                                .frame(height: 80)
                         }
-                        .pickerStyle(.segmented)
-                        .padding(.horizontal, 20)
-                        Spacer()
-                            .frame(height: 80)
                     }
                 }
                 .navigationTitle("Iso App")
@@ -89,6 +139,7 @@ struct ContentView: View {
                 Image(systemName: "house")
                 Text("Home")
             }
+            .tag(0)
             
             //Set up the Pain Tracking page
             NavigationView {
@@ -98,9 +149,16 @@ struct ContentView: View {
                             Text("Today's Pain Level")
                                 .font(.title)
                                 .bold()
-                            TextField(textToDisplayInPainTrackingInputField, text: $todaysPainLevel)
-                                .keyboardType(.numberPad)
-                                .textFieldStyle(RoundedBorderTextFieldStyle())
+                            Slider(value: $todaysPainLevel, in: 1...10, step: 1)
+                                .onChange(of: todaysPainLevel) { oldValue, newValue in
+                                    // Convert the slider's value (Double) to an integer
+                                    painLevelInt = Int(newValue)
+                                }
+                            
+                            Text("\(painLevelInt ?? 1)")
+                                .font(.title3)
+                                .frame(maxWidth: .infinity, alignment: .center)
+                            
                             Button(action: submitPainLevel){
                                 Text("Submit")
                             }
@@ -140,6 +198,7 @@ struct ContentView: View {
                 Image(systemName: "calendar")
                 Text("Pain Tracking")
             }
+            .tag(1)
             
             //Set up the Timer page
             NavigationView {
@@ -153,9 +212,11 @@ struct ContentView: View {
                             .onReceive(timer) { _ in
                                 if timerDuration > 0 && timerRunning{
                                     timerDuration -= 1
+                                    tabSwitchingAllowed = false
                                 } else{
                                     timerRunning = false
-                                    timerDuration = Int(isoDurationInput) ?? 0
+                                    tabSwitchingAllowed = true
+                                    timerDuration = Int(isoDurationInput)
                                 }
                             }
                             .font(.system(size: 80, weight: .bold))
@@ -168,20 +229,25 @@ struct ContentView: View {
                     Image(systemName: "timer")
                     Text("Timer")
             }
+                .tag(2)
             
             //Set up the Settings page
             NavigationView {
                 VStack{
                     Form{
                         VStack(alignment: .leading) {
-                            Text("Iso Duration")
+                            Text("Isometric Duration")
                                 .font(.headline)
-                            TextField("Enter Iso Duration", text: $isoDurationInput)
-                                .keyboardType(.numberPad)
-                                .textFieldStyle(RoundedBorderTextFieldStyle())
-                            Button(action: saveSettings){
-                                Text("save")
-                            }
+                            
+                            Slider(value: $isoDurationInput, in: 30...60, step: 1)
+                                .onChange(of: isoDurationInput) { oldValue, newValue in
+                                    // Convert the slider's value (Double) to an integer
+                                    timerDuration = Int(newValue)
+                                }
+                            Text("\(timerDuration)s")
+                                .font(.title3)
+                                .frame(maxWidth: .infinity, alignment: .center)
+                            
                         }
                     }
                 }
@@ -191,14 +257,20 @@ struct ContentView: View {
                 Image(systemName: "gear")
                 Text("Settings")
             }
+            .tag(3)
             
             }
+        .onChange(of: selectedTab) {oldTab, newTab in
+            if tabSwitchingAllowed == false{
+                selectedTab = 2
+            }
+        }
             
         }
     
     //filter data
     var filteredData: [painDataPoint] {
-        let count: Int
+        @State var count: Int
         switch graphSize {
         case .three:
             count = 3
@@ -213,31 +285,15 @@ struct ContentView: View {
         case .all:
             count = data.count
         }
+        graphSizeInt = count
         return Array(data.suffix(count))
         }
     
-    //Functions for settings page
-    func saveSettings(){
-        timerDuration = Int(isoDurationInput) ?? 0
-        timerRunning = false
-    }
-    
     //Functions for Pain Level page
     func submitPainLevel(){
-        if let testnum = Int(todaysPainLevel), testnum >= 1 && testnum <= 10 {
-                painLevelInt = testnum
-                textToDisplayInPainTrackingInputField = "Enter pain level, 1-10"
-                formerPainLevels.append(painLevelInt ?? 0)
-            
-                //do stuff for graph
-                //convert date to string
-            
-            data.append(painDataPoint(dateForPlot: dateFormatter.string(from: currentDate), painForPlot: painLevelInt ?? 0))
-            } else {
-                todaysPainLevel = ""
-                textToDisplayInPainTrackingInputField = "Please enter a valid number, 1-10"
-                
-            }
+        formerPainLevels.insert(painLevelInt ?? 1, at: 0)
+        data.append(painDataPoint(dateForPlot: dateFormatter.string(from: currentDate), painForPlot: painLevelInt ?? 1))
+        print(data.count)
     }
     
     func clearPainHistory(){
