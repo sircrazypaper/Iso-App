@@ -293,7 +293,6 @@ struct ContentView: View {
     func submitPainLevel(){
         formerPainLevels.insert(painLevelInt ?? 1, at: 0)
         data.append(painDataPoint(dateForPlot: dateFormatter.string(from: currentDate), painForPlot: painLevelInt ?? 1))
-        print(data.count)
     }
     
     func clearPainHistory(){
