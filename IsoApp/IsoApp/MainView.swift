@@ -70,6 +70,8 @@ struct ContentView: View {
                             .bold()
                         Chart{
                             ForEach(filteredData) { d in
+                                PointMark(x: PlottableValue.value("Day", d.dateForPlot), y: .value("Pain level", d.painForPlot))
+                                
                                 LineMark(x: PlottableValue.value("Day", d.dateForPlot), y: .value("Pain level", d.painForPlot))
                                     .interpolationMethod(.catmullRom)
                             }
@@ -136,8 +138,8 @@ struct ContentView: View {
                 .navigationTitle("Iso App")
             }
             .tabItem{
-                Image(systemName: "house")
-                Text("Home")
+                Image(systemName: "chart.xyaxis.line")
+                Text("Graph")
             }
             .tag(0)
             
@@ -236,7 +238,7 @@ struct ContentView: View {
                 VStack{
                     Form{
                         VStack(alignment: .leading) {
-                            Text("Isometric Duration")
+                            Text("Isometric Exercise Duration")
                                 .font(.headline)
                             
                             Slider(value: $isoDurationInput, in: 30...60, step: 1)
