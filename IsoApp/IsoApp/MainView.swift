@@ -44,6 +44,7 @@ struct ContentView: View {
     @State var painLevelInt: Int?
     @State var formerPainLevels: [Int] = []
     @State var currentDate = Date()
+    @State private var buttonDisabled: Bool = false
     
     //Define variables for the Timer page
     @State var timerDuration: Int = 45
@@ -135,7 +136,7 @@ struct ContentView: View {
                         }
                     }
                 }
-                .navigationTitle("Iso App")
+                .navigationTitle("Graph")
             }
             .tabItem{
                 Image(systemName: "chart.xyaxis.line")
@@ -161,9 +162,16 @@ struct ContentView: View {
                                 .font(.title3)
                                 .frame(maxWidth: .infinity, alignment: .center)
                             
-                            Button(action: submitPainLevel){
+                            Button(action: {
+                                if canRunActionToday(){
+                                    runAction()
+                                }
+                            }){
                                 Text("Submit")
+                                    .foregroundColor(buttonDisabled ? Color.gray : Color.blue)
                             }
+                            .disabled(buttonDisabled)
+                            
                         }
                         .padding(20)
                     
@@ -190,6 +198,9 @@ struct ContentView: View {
                         
                     }
                     
+                }
+                .onAppear {
+                    buttonDisabled = !canRunActionToday()
                 }
                 .frame(maxHeight: .infinity, alignment: .top)
                 
@@ -301,6 +312,35 @@ struct ContentView: View {
         formerPainLevels = []
         data = []
     }
+    
+    func canRunActionToday() -> Bool {
+            guard let lastPressedDate = UserDefaults.standard.string(forKey: "lastActionDate") else {
+                return true
+            }
+
+            let formatter = DateFormatter()
+            formatter.dateFormat = "yyyy-MM-dd"
+            let currentDateString = formatter.string(from: Date())
+
+            if lastPressedDate == currentDateString {
+                return false
+            } else {
+                return true
+            }
+        }
+    
+    func runAction() {
+            let currentDate = Date()
+            let formatter = DateFormatter()
+            formatter.dateFormat = "yyyy-MM-dd"
+            let currentDateString = formatter.string(from: currentDate)
+
+            UserDefaults.standard.set(currentDateString, forKey: "lastActionDate")
+
+            buttonDisabled = true
+
+            submitPainLevel()
+        }
     
     // Custom date formatter to display the date in a readable format
         private var dateFormatter: DateFormatter {
