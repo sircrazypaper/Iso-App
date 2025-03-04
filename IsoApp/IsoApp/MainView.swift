@@ -75,7 +75,7 @@ struct ContentView: View {
                             }
                         }
                         
-                        Text("Graph size")
+                        Text("Graph data points")
                             .foregroundColor(.secondary)
                         
                         if data.count < 3{
