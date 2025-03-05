@@ -57,6 +57,12 @@ struct ContentView: View {
     //Define variables for the Settings page
     @State var isoDurationInput: Double = 45
     
+    //Define variables for the notifications
+    @State var timeForFirstIso = Date()
+    @State var timeForSecondIso = Date()
+    @State var timeForThirdIso = Date()
+    @State var timeForPainTracking = Date()
+    
     var body: some View {
         TabView(selection: $selectedTab){
             
@@ -251,17 +257,35 @@ struct ContentView: View {
                 VStack{
                     Form{
                         VStack(alignment: .leading) {
+                            //Iso Duration settings
                             Text("Isometric Exercise Duration")
                                 .font(.headline)
+                                .padding()
                             
                             Slider(value: $isoDurationInput, in: 30...60, step: 1)
                                 .onChange(of: isoDurationInput) { oldValue, newValue in
                                     // Convert the slider's value (Double) to an integer
                                     timerDuration = Int(newValue)
                                 }
+                                .padding()
                             Text("\(timerDuration)s")
                                 .font(.title3)
                                 .frame(maxWidth: .infinity, alignment: .center)
+                            
+                            //Notification settings
+                            Text("Notification settings")
+                                .font(.headline)
+                                .padding()
+                            Text("Time for first isometric exercise")
+                                .font(.subheadline)
+                                .padding()
+                            
+                            DatePicker("Time", selection: $timeForFirstIso, displayedComponents: [.hourAndMinute])
+                                .datePickerStyle(WheelDatePickerStyle())
+                                .padding()
+                                .onChange(of: timeForFirstIso){ oldTime, newTime in
+                                    scheduleFirstIsoNotification(at: newTime)
+                                }
                             
                         }
                     }
@@ -275,10 +299,6 @@ struct ContentView: View {
             .tag(3)
             
             }
-        .onAppear {
-            scheduleNotification()
-        }
-        
         .onChange(of: selectedTab) {oldTab, newTab in
             if tabSwitchingAllowed == false{
                 selectedTab = 2
@@ -357,28 +377,29 @@ struct ContentView: View {
         }
     
     //Notification function
-    func scheduleNotification(){
+    func scheduleFirstIsoNotification(at time: Date){
         let center = UNUserNotificationCenter.current()
         let content = UNMutableNotificationContent()
-        content.title = "Yo"
-        content.body = "YOOOOOOOO"
+        content.title = "Isometric Exercise Reminder"
+        content.body = "It is time for your first set of isometric exercises"
         
-        let dateForNotification = Date()
+        let calendar = Calendar.current
+        let components = calendar.dateComponents([.hour, .minute], from: time)
         
-        var dateComponents = Calendar.current.dateComponents([.year, .month, .day], from: dateForNotification)
-        dateComponents.hour = 19
-        dateComponents.minute = 0
+        var dateComponents = calendar.dateComponents([.year, .month, .day], from: Date())
+        dateComponents.hour = components.hour
+        dateComponents.minute = components.minute
         
-        if let triggerDate = Calendar.current.date(from: dateComponents), triggerDate < dateForNotification{
+        if let triggerDate = calendar.date(from: dateComponents), triggerDate < Date() {
             dateComponents.day! += 1
         }
         
         let trigger = UNCalendarNotificationTrigger(dateMatching: dateComponents, repeats: false)
-        let request = UNNotificationRequest(identifier: "identifier", content: content, trigger: trigger)
+        let request = UNNotificationRequest(identifier: "notificationIdentifier", content: content, trigger: trigger)
         
         center.add(request) { error in
-            if let error = error{
-                print(error)
+            if let error = error {
+                print("Error scheduling notification: \(error.localizedDescription)")
             }
         }
     }
