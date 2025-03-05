@@ -7,6 +7,7 @@
 
 import SwiftUI
 import Charts
+import UserNotifications
 
 struct painDataPoint: Identifiable{
     var id = UUID().uuidString
@@ -15,6 +16,7 @@ struct painDataPoint: Identifiable{
 }
 
 struct ContentView: View {
+    
     //Define miscellaneus variables
     @State var selectedTab = 0
     
@@ -273,6 +275,10 @@ struct ContentView: View {
             .tag(3)
             
             }
+        .onAppear {
+            scheduleNotification()
+        }
+        
         .onChange(of: selectedTab) {oldTab, newTab in
             if tabSwitchingAllowed == false{
                 selectedTab = 2
@@ -342,13 +348,40 @@ struct ContentView: View {
             submitPainLevel()
         }
     
-    // Custom date formatter to display the date in a readable format
+    //Date formatter
         private var dateFormatter: DateFormatter {
             let formatter = DateFormatter()
             formatter.dateStyle = .medium
             formatter.timeStyle = .none
             return formatter
         }
+    
+    //Notification function
+    func scheduleNotification(){
+        let center = UNUserNotificationCenter.current()
+        let content = UNMutableNotificationContent()
+        content.title = "Yo"
+        content.body = "YOOOOOOOO"
+        
+        let dateForNotification = Date()
+        
+        var dateComponents = Calendar.current.dateComponents([.year, .month, .day], from: dateForNotification)
+        dateComponents.hour = 19
+        dateComponents.minute = 0
+        
+        if let triggerDate = Calendar.current.date(from: dateComponents), triggerDate < dateForNotification{
+            dateComponents.day! += 1
+        }
+        
+        let trigger = UNCalendarNotificationTrigger(dateMatching: dateComponents, repeats: false)
+        let request = UNNotificationRequest(identifier: "identifier", content: content, trigger: trigger)
+        
+        center.add(request) { error in
+            if let error = error{
+                print(error)
+            }
+        }
+    }
     
     }
 
