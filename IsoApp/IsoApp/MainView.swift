@@ -240,7 +240,7 @@ struct ContentView: View {
                                     timerDuration = Int(isoDurationInput)
                                 }
                             }
-                            .font(.system(size: 80, weight: .bold))
+                            .font(.system(size: 100, weight: .bold))
                             .foregroundColor(.primary)
                     }
                     }
@@ -259,8 +259,10 @@ struct ContentView: View {
                         VStack(alignment: .leading) {
                             //Iso Duration settings
                             Text("Isometric Exercise Duration")
-                                .font(.headline)
+                                .font(.title2)
+                                .bold()
                                 .padding()
+                                .frame(maxWidth: .infinity, alignment: .center)
                             
                             Slider(value: $isoDurationInput, in: 30...60, step: 1)
                                 .onChange(of: isoDurationInput) { oldValue, newValue in
@@ -269,22 +271,46 @@ struct ContentView: View {
                                 }
                                 .padding()
                             Text("\(timerDuration)s")
-                                .font(.title3)
+                                .font(.title2)
                                 .frame(maxWidth: .infinity, alignment: .center)
                             
                             //Notification settings
                             Text("Notification settings")
+                                .font(.title2)
+                                .bold()
+                                .padding()
+                                .frame(maxWidth: .infinity, alignment: .center)
+                            
+                            Text("Isometric Exercise Notifications")
                                 .font(.headline)
                                 .padding()
-                            Text("Time for first isometric exercise")
-                                .font(.subheadline)
-                                .padding()
                             
-                            DatePicker("Time", selection: $timeForFirstIso, displayedComponents: [.hourAndMinute])
-                                .datePickerStyle(WheelDatePickerStyle())
-                                .padding()
+                            DatePicker("First set:", selection: $timeForFirstIso, displayedComponents: [.hourAndMinute])
+                                .datePickerStyle(.compact)
                                 .onChange(of: timeForFirstIso){ oldTime, newTime in
                                     scheduleFirstIsoNotification(at: newTime)
+                                }
+                            
+                            DatePicker("Second set:", selection: $timeForSecondIso, displayedComponents: [.hourAndMinute])
+                                .datePickerStyle(.compact)
+                                .onChange(of: timeForSecondIso){ oldTime, newTime in
+                                    scheduleSecondIsoNotification(at: newTime)
+                                }
+                            
+                            DatePicker("Third set:", selection: $timeForThirdIso, displayedComponents: [.hourAndMinute])
+                                .datePickerStyle(.compact)
+                                .onChange(of: timeForThirdIso){ oldTime, newTime in
+                                    scheduleThirdIsoNotification(at: newTime)
+                                }
+                            
+                            Text("Pain tracking notifications")
+                                .font(.headline)
+                                .padding()
+                            
+                            DatePicker("Pain tracking:", selection: $timeForPainTracking, displayedComponents: [.hourAndMinute])
+                                .datePickerStyle(.compact)
+                                .onChange(of: timeForPainTracking){ oldTime, newTime in
+                                    schedulePainTrackingNotification(at: newTime)
                                 }
                             
                         }
@@ -381,7 +407,7 @@ struct ContentView: View {
         let center = UNUserNotificationCenter.current()
         let content = UNMutableNotificationContent()
         content.title = "Isometric Exercise Reminder"
-        content.body = "It is time for your first set of isometric exercises"
+        content.body = "It is time for your first set of isometric exercises!"
         
         let calendar = Calendar.current
         let components = calendar.dateComponents([.hour, .minute], from: time)
@@ -395,6 +421,87 @@ struct ContentView: View {
         }
         
         let trigger = UNCalendarNotificationTrigger(dateMatching: dateComponents, repeats: false)
+        let request = UNNotificationRequest(identifier: "notificationIdentifier", content: content, trigger: trigger)
+        
+        center.add(request) { error in
+            if let error = error {
+                print("Error scheduling notification: \(error.localizedDescription)")
+            }
+        }
+    }
+    
+    func scheduleSecondIsoNotification(at time: Date){
+        let center = UNUserNotificationCenter.current()
+        let content = UNMutableNotificationContent()
+        content.title = "Isometric Exercise Reminder"
+        content.body = "It is time for your second set of isometric exercises!"
+        
+        let calendar = Calendar.current
+        let components = calendar.dateComponents([.hour, .minute], from: time)
+        
+        var dateComponents2 = calendar.dateComponents([.year, .month, .day], from: Date())
+        dateComponents2.hour = components.hour
+        dateComponents2.minute = components.minute
+        
+        if let triggerDate = calendar.date(from: dateComponents2), triggerDate < Date() {
+            dateComponents2.day! += 1
+        }
+        
+        let trigger = UNCalendarNotificationTrigger(dateMatching: dateComponents2, repeats: false)
+        let request = UNNotificationRequest(identifier: "notificationIdentifier", content: content, trigger: trigger)
+        
+        center.add(request) { error in
+            if let error = error {
+                print("Error scheduling notification: \(error.localizedDescription)")
+            }
+        }
+    }
+    
+    func scheduleThirdIsoNotification(at time: Date){
+        let center = UNUserNotificationCenter.current()
+        let content = UNMutableNotificationContent()
+        content.title = "Isometric Exercise Reminder"
+        content.body = "It is time for your third set of isometric exercises!"
+        
+        let calendar = Calendar.current
+        let components = calendar.dateComponents([.hour, .minute], from: time)
+        
+        var dateComponents3 = calendar.dateComponents([.year, .month, .day], from: Date())
+        dateComponents3.hour = components.hour
+        dateComponents3.minute = components.minute
+        
+        if let triggerDate = calendar.date(from: dateComponents3), triggerDate < Date() {
+            dateComponents3.day! += 1
+        }
+        
+        let trigger = UNCalendarNotificationTrigger(dateMatching: dateComponents3, repeats: false)
+        let request = UNNotificationRequest(identifier: "notificationIdentifier", content: content, trigger: trigger)
+        
+        center.add(request) { error in
+            if let error = error {
+                print("Error scheduling notification: \(error.localizedDescription)")
+            }
+        }
+    }
+    
+    func schedulePainTrackingNotification(at time: Date){
+        let center = UNUserNotificationCenter.current()
+        let content = UNMutableNotificationContent()
+        content.title = "Pain Tracking Reminder"
+        content.body = "It is time to track your tendon pain!"
+        
+        let calendar = Calendar.current
+        let components = calendar.dateComponents([.hour, .minute], from: time)
+        
+        var dateComponents4 = calendar.dateComponents([.year, .month, .day], from: Date())
+        dateComponents4.hour = components.hour
+        dateComponents4.minute = components.minute
+        
+        if let triggerDate = calendar.date(from: dateComponents4), triggerDate < Date() {
+            dateComponents4.day! += 1
+        }
+        
+        let trigger = UNCalendarNotificationTrigger(dateMatching: dateComponents4, repeats: false)
         let request = UNNotificationRequest(identifier: "notificationIdentifier", content: content, trigger: trigger)
         
         center.add(request) { error in
