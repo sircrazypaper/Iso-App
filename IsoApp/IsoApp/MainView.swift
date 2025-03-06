@@ -292,18 +292,21 @@ struct ContentView: View {
                                 .datePickerStyle(.compact)
                                 .onChange(of: timeForFirstIso){ oldTime, newTime in
                                     scheduleFirstIsoNotification(at: newTime)
+                                    UserDefaults.standard.set(timeForFirstIso, forKey: "savedTimeForFirstIso")
                                 }
                             
                             DatePicker("Second set:", selection: $timeForSecondIso, displayedComponents: [.hourAndMinute])
                                 .datePickerStyle(.compact)
                                 .onChange(of: timeForSecondIso){ oldTime2, newTime2 in
                                     scheduleSecondIsoNotification(at: newTime2)
+                                    UserDefaults.standard.set(timeForSecondIso, forKey: "savedTimeForSecondIso")
                                 }
                             
                             DatePicker("Third set:", selection: $timeForThirdIso, displayedComponents: [.hourAndMinute])
                                 .datePickerStyle(.compact)
                                 .onChange(of: timeForThirdIso){ oldTime3, newTime3 in
                                     scheduleThirdIsoNotification(at: newTime3)
+                                    UserDefaults.standard.set(timeForThirdIso, forKey: "savedTimeForThirdIso")
                                 }
                             
                             Text("Pain tracking notifications")
@@ -314,15 +317,29 @@ struct ContentView: View {
                                 .datePickerStyle(.compact)
                                 .onChange(of: timeForPainTracking){ oldTime3, newTime3 in
                                     schedulePainTrackingNotification(at: newTime3)
+                                    UserDefaults.standard.set(timeForPainTracking, forKey: "savedTimeForPainTracking")
                                 }
                             
                         }
                     }
+                    
                 }
                 .navigationTitle("Settings")
                 .onAppear{
                     if let savedIsoDurationInput = UserDefaults.standard.value(forKey: "savedIsoDurationInput") as? Double{
                         isoDurationInput = savedIsoDurationInput
+                    }
+                    if let savedTimeForFirstIso = UserDefaults.standard.value(forKey: "savedTimeForFirstIso") as? Date{
+                        timeForFirstIso = savedTimeForFirstIso
+                    }
+                    if let savedTimeForSecondIso = UserDefaults.standard.value(forKey: "savedTimeForSecondIso") as? Date{
+                        timeForSecondIso = savedTimeForSecondIso
+                    }
+                    if let savedTimeForThirdIso = UserDefaults.standard.value(forKey: "savedTimeForThirdIso") as? Date{
+                        timeForThirdIso = savedTimeForThirdIso
+                    }
+                    if let savedTimeForPainTracking = UserDefaults.standard.value(forKey: "savedTimeForPainTracking") as? Date{
+                        timeForPainTracking = savedTimeForPainTracking
                     }
                 }
             }
