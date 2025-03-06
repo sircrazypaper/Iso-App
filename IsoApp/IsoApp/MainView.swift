@@ -9,10 +9,10 @@ import SwiftUI
 import Charts
 import UserNotifications
 
-struct painDataPoint: Identifiable{
-    var id = UUID().uuidString
-    @State var dateForPlot: String
-    @State var painForPlot: Int
+struct painDataPoint: Identifiable, Codable{
+    var id = UUID()
+    var dateForPlot: String
+    var painForPlot: Int
 }
 
 struct ContentView: View {
@@ -21,7 +21,7 @@ struct ContentView: View {
     @State var selectedTab = 0
     
     //Define variables for the chart
-    @State var data = [
+    @State var data: [painDataPoint] = [
         painDataPoint(dateForPlot: "MACRCH 5", painForPlot: 4),
         painDataPoint(dateForPlot: "MACRCH 6", painForPlot: 10),
         painDataPoint(dateForPlot: "MACRCH 7", painForPlot: 6),
@@ -170,7 +170,7 @@ struct ContentView: View {
                                 .frame(maxWidth: .infinity, alignment: .center)
                             
                             Button(action: {
-                                if canRunActionToday(){
+                               if canRunActionToday(){
                                     runAction()
                                 }
                             }){
@@ -178,6 +178,7 @@ struct ContentView: View {
                                     .foregroundColor(buttonDisabled ? Color.gray : Color.blue)
                             }
                             .disabled(buttonDisabled)
+                            
                             
                         }
                         .padding(20)
@@ -360,6 +361,9 @@ struct ContentView: View {
             .tag(3)
             
             }
+        .onAppear{
+            loadData()
+        }
         .onChange(of: selectedTab) {oldTab, newTab in
             if tabSwitchingAllowed == false{
                 selectedTab = 2
@@ -368,6 +372,22 @@ struct ContentView: View {
             
         }
         
+    //Functions for saving the pain history data
+    func saveData(){
+        let encoder = JSONEncoder()
+        if let encoded = try? encoder.encode(data){
+            UserDefaults.standard.set(encoded, forKey: "savedPainData")
+        }
+    }
+    
+    func loadData(){
+        if let savedData = UserDefaults.standard.data(forKey: "savedPainData"){
+            let decoder = JSONDecoder()
+            if let loadedData = try? decoder.decode([painDataPoint].self, from: savedData){
+                data = loadedData
+            }
+        }
+    }
     
     //filter data
     var filteredData: [painDataPoint] {
@@ -393,6 +413,7 @@ struct ContentView: View {
     //Functions for Pain Level page
     func submitPainLevel(){
         data.append(painDataPoint(dateForPlot: dateFormatter.string(from: currentDate), painForPlot: painLevelInt ?? 1))
+        saveData()
     }
     
     func clearPainHistory(){
