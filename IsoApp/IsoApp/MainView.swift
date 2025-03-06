@@ -293,14 +293,14 @@ struct ContentView: View {
                             
                             DatePicker("Second set:", selection: $timeForSecondIso, displayedComponents: [.hourAndMinute])
                                 .datePickerStyle(.compact)
-                                .onChange(of: timeForSecondIso){ oldTime, newTime in
-                                    scheduleSecondIsoNotification(at: newTime)
+                                .onChange(of: timeForSecondIso){ oldTime2, newTime2 in
+                                    scheduleSecondIsoNotification(at: newTime2)
                                 }
                             
                             DatePicker("Third set:", selection: $timeForThirdIso, displayedComponents: [.hourAndMinute])
                                 .datePickerStyle(.compact)
-                                .onChange(of: timeForThirdIso){ oldTime, newTime in
-                                    scheduleThirdIsoNotification(at: newTime)
+                                .onChange(of: timeForThirdIso){ oldTime3, newTime3 in
+                                    scheduleThirdIsoNotification(at: newTime3)
                                 }
                             
                             Text("Pain tracking notifications")
@@ -309,8 +309,8 @@ struct ContentView: View {
                             
                             DatePicker("Pain tracking:", selection: $timeForPainTracking, displayedComponents: [.hourAndMinute])
                                 .datePickerStyle(.compact)
-                                .onChange(of: timeForPainTracking){ oldTime, newTime in
-                                    schedulePainTrackingNotification(at: newTime)
+                                .onChange(of: timeForPainTracking){ oldTime3, newTime3 in
+                                    schedulePainTrackingNotification(at: newTime3)
                                 }
                             
                         }
@@ -430,83 +430,83 @@ struct ContentView: View {
         }
     }
     
-    func scheduleSecondIsoNotification(at time: Date){
-        let center = UNUserNotificationCenter.current()
-        let content = UNMutableNotificationContent()
-        content.title = "Isometric Exercise Reminder"
-        content.body = "It is time for your second set of isometric exercises!"
+    func scheduleSecondIsoNotification(at time2: Date){
+        let center2 = UNUserNotificationCenter.current()
+        let content2 = UNMutableNotificationContent()
+        content2.title = "Isometric Exercise Reminder"
+        content2.body = "It is time for your second set of isometric exercises!"
         
-        let calendar = Calendar.current
-        let components = calendar.dateComponents([.hour, .minute], from: time)
+        let calendar2 = Calendar.current
+        let components2 = calendar2.dateComponents([.hour, .minute], from: time2)
         
-        var dateComponents2 = calendar.dateComponents([.year, .month, .day], from: Date())
-        dateComponents2.hour = components.hour
-        dateComponents2.minute = components.minute
+        var dateComponents2 = calendar2.dateComponents([.year, .month, .day], from: Date())
+        dateComponents2.hour = components2.hour
+        dateComponents2.minute = components2.minute
         
-        if let triggerDate = calendar.date(from: dateComponents2), triggerDate < Date() {
+        if let triggerDate2 = calendar2.date(from: dateComponents2), triggerDate2 < Date() {
             dateComponents2.day! += 1
         }
         
-        let trigger = UNCalendarNotificationTrigger(dateMatching: dateComponents2, repeats: false)
-        let request = UNNotificationRequest(identifier: "notificationIdentifier", content: content, trigger: trigger)
+        let trigger2 = UNCalendarNotificationTrigger(dateMatching: dateComponents2, repeats: false)
+        let request2 = UNNotificationRequest(identifier: "notificationIdentifier2", content: content2, trigger: trigger2)
         
-        center.add(request) { error in
-            if let error = error {
-                print("Error scheduling notification: \(error.localizedDescription)")
+        center2.add(request2) { error in
+            if let error2 = error {
+                print("Error scheduling notification: \(error2.localizedDescription)")
             }
         }
     }
     
-    func scheduleThirdIsoNotification(at time: Date){
-        let center = UNUserNotificationCenter.current()
-        let content = UNMutableNotificationContent()
-        content.title = "Isometric Exercise Reminder"
-        content.body = "It is time for your third set of isometric exercises!"
+    func scheduleThirdIsoNotification(at time3: Date){
+        let center3 = UNUserNotificationCenter.current()
+        let content3 = UNMutableNotificationContent()
+        content3.title = "Isometric Exercise Reminder"
+        content3.body = "It is time for your third set of isometric exercises!"
         
-        let calendar = Calendar.current
-        let components = calendar.dateComponents([.hour, .minute], from: time)
+        let calendar3 = Calendar.current
+        let components3 = calendar3.dateComponents([.hour, .minute], from: time3)
         
-        var dateComponents3 = calendar.dateComponents([.year, .month, .day], from: Date())
-        dateComponents3.hour = components.hour
-        dateComponents3.minute = components.minute
+        var dateComponents3 = calendar3.dateComponents([.year, .month, .day], from: Date())
+        dateComponents3.hour = components3.hour
+        dateComponents3.minute = components3.minute
         
-        if let triggerDate = calendar.date(from: dateComponents3), triggerDate < Date() {
+        if let triggerDate3 = calendar3.date(from: dateComponents3), triggerDate3 < Date() {
             dateComponents3.day! += 1
         }
         
-        let trigger = UNCalendarNotificationTrigger(dateMatching: dateComponents3, repeats: false)
-        let request = UNNotificationRequest(identifier: "notificationIdentifier", content: content, trigger: trigger)
+        let trigger3 = UNCalendarNotificationTrigger(dateMatching: dateComponents3, repeats: false)
+        let request3 = UNNotificationRequest(identifier: "notificationIdentifier3", content: content3, trigger: trigger3)
         
-        center.add(request) { error in
-            if let error = error {
-                print("Error scheduling notification: \(error.localizedDescription)")
+        center3.add(request3) { error in
+            if let error3 = error {
+                print("Error scheduling notification: \(error3.localizedDescription)")
             }
         }
     }
     
-    func schedulePainTrackingNotification(at time: Date){
-        let center = UNUserNotificationCenter.current()
-        let content = UNMutableNotificationContent()
-        content.title = "Pain Tracking Reminder"
-        content.body = "It is time to track your tendon pain!"
+    func schedulePainTrackingNotification(at time4: Date){
+        let center4 = UNUserNotificationCenter.current()
+        let content4 = UNMutableNotificationContent()
+        content4.title = "Pain Tracking Reminder"
+        content4.body = "It is time to track your tendon pain!"
         
-        let calendar = Calendar.current
-        let components = calendar.dateComponents([.hour, .minute], from: time)
+        let calendar4 = Calendar.current
+        let components4 = calendar4.dateComponents([.hour, .minute], from: time4)
         
-        var dateComponents4 = calendar.dateComponents([.year, .month, .day], from: Date())
-        dateComponents4.hour = components.hour
-        dateComponents4.minute = components.minute
+        var dateComponents4 = calendar4.dateComponents([.year, .month, .day], from: Date())
+        dateComponents4.hour = components4.hour
+        dateComponents4.minute = components4.minute
         
-        if let triggerDate = calendar.date(from: dateComponents4), triggerDate < Date() {
+        if let triggerDate4 = calendar4.date(from: dateComponents4), triggerDate4 < Date() {
             dateComponents4.day! += 1
         }
         
-        let trigger = UNCalendarNotificationTrigger(dateMatching: dateComponents4, repeats: false)
-        let request = UNNotificationRequest(identifier: "notificationIdentifier", content: content, trigger: trigger)
+        let trigger4 = UNCalendarNotificationTrigger(dateMatching: dateComponents4, repeats: false)
+        let request4 = UNNotificationRequest(identifier: "notificationIdentifier4", content: content4, trigger: trigger4)
         
-        center.add(request) { error in
-            if let error = error {
-                print("Error scheduling notification: \(error.localizedDescription)")
+        center4.add(request4) { error in
+            if let error4 = error {
+                print("Error scheduling notification: \(error4.localizedDescription)")
             }
         }
     }
