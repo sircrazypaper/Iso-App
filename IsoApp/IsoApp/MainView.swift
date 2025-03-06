@@ -41,10 +41,8 @@ struct ContentView: View {
     @State var graphSizeInt: Int?
     
     //Define variables for the Pain Tracking page
-    @State var textToDisplayInPainTrackingInputField = "Enter pain level, 1-10"
     @State var todaysPainLevel: Double = 1.0
     @State var painLevelInt: Int?
-    @State var formerPainLevels: [Int] = []
     @State var currentDate = Date()
     @State private var buttonDisabled: Bool = false
     
@@ -353,12 +351,10 @@ struct ContentView: View {
     
     //Functions for Pain Level page
     func submitPainLevel(){
-        formerPainLevels.insert(painLevelInt ?? 1, at: 0)
         data.append(painDataPoint(dateForPlot: dateFormatter.string(from: currentDate), painForPlot: painLevelInt ?? 1))
     }
     
     func clearPainHistory(){
-        formerPainLevels = []
         data = []
     }
     
