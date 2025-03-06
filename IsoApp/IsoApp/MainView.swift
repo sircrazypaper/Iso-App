@@ -240,6 +240,12 @@ struct ContentView: View {
                     }
                     }
                 .navigationTitle("Timer")
+                .onAppear{
+                    if let savedTimerDuration = UserDefaults.standard.value(forKey: "savedTimerDuration") as? Int{
+                        timerDuration = savedTimerDuration
+                    }
+                    
+                }
                 }
                 .tabItem{
                     Image(systemName: "timer")
@@ -263,6 +269,8 @@ struct ContentView: View {
                                 .onChange(of: isoDurationInput) { oldValue, newValue in
                                     // Convert the slider's value (Double) to an integer
                                     timerDuration = Int(newValue)
+                                    UserDefaults.standard.set(timerDuration, forKey: "savedTimerDuration")
+                                    UserDefaults.standard.set(isoDurationInput, forKey: "savedIsoDurationInput")
                                 }
                                 .padding()
                             Text("\(timerDuration)s")
@@ -312,6 +320,11 @@ struct ContentView: View {
                     }
                 }
                 .navigationTitle("Settings")
+                .onAppear{
+                    if let savedIsoDurationInput = UserDefaults.standard.value(forKey: "savedIsoDurationInput") as? Double{
+                        isoDurationInput = savedIsoDurationInput
+                    }
+                }
             }
             .tabItem{
                 Image(systemName: "gear")
@@ -327,6 +340,7 @@ struct ContentView: View {
         }
             
         }
+        
     
     //filter data
     var filteredData: [painDataPoint] {
