@@ -162,7 +162,6 @@ struct ContentView: View {
                                 .bold()
                             Slider(value: $todaysPainLevel, in: 1...10, step: 1)
                                 .onChange(of: todaysPainLevel) { oldValue, newValue in
-                                    // Convert the slider's value (Double) to an integer
                                     painLevelInt = Int(newValue)
                                 }
                             
@@ -189,17 +188,15 @@ struct ContentView: View {
                             .padding(20)
                             .font(.title)
                             .bold()
-                        
-                        
-                        
+                         
                         List {
                             Button(action: clearPainHistory){
                                 Text("Clear all history")
                                     .foregroundColor(.red)
                             }
                             
-                            ForEach(formerPainLevels, id: \.self) { item in
-                                Text("\(currentDate, formatter: dateFormatter): \(item)") // Display each integer in the array on a new line
+                            ForEach(data.reversed(), id: \.dateForPlot) { item in
+                                Text("\(item.dateForPlot): \(item.painForPlot)")
                             }
                             .frame(maxWidth: .infinity, alignment: .leading)
                         }
