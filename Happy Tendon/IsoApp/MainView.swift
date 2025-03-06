@@ -21,14 +21,7 @@ struct ContentView: View {
     @State var selectedTab = 0
     
     //Define variables for the chart
-    @State var data: [painDataPoint] = [
-        painDataPoint(dateForPlot: "MACRCH 5", painForPlot: 4),
-        painDataPoint(dateForPlot: "MACRCH 6", painForPlot: 10),
-        painDataPoint(dateForPlot: "MACRCH 7", painForPlot: 6),
-        painDataPoint(dateForPlot: "MACRCH 8", painForPlot: 1),
-        painDataPoint(dateForPlot: "MACRCH 9", painForPlot: 7),
-        painDataPoint(dateForPlot: "MACRCH 10", painForPlot: 5),
-        painDataPoint(dateForPlot: "MACRCH 11", painForPlot: 4),]
+    @State var data: [painDataPoint] = []
     enum graphSizes: String, CaseIterable{
         case all = "All"
         case three = "3"
@@ -159,7 +152,7 @@ struct ContentView: View {
                                 .font(.title)
                                 .bold()
                             Slider(value: $todaysPainLevel, in: 1...10, step: 1)
-                                .onChange(of: todaysPainLevel) { oldValue, newValue in
+                                .onChange(of: todaysPainLevel) { newValue in
                                     painLevelInt = Int(newValue)
                                     UserDefaults.standard.set(todaysPainLevel, forKey: "savedTodaysPainLevel")
                                     UserDefaults.standard.set(painLevelInt, forKey: "savedPainLevelInt")
@@ -277,7 +270,7 @@ struct ContentView: View {
                                 .frame(maxWidth: .infinity, alignment: .center)
                             
                             Slider(value: $isoDurationInput, in: 30...60, step: 1)
-                                .onChange(of: isoDurationInput) { oldValue, newValue in
+                                .onChange(of: isoDurationInput) { newValue in
                                     // Convert the slider's value (Double) to an integer
                                     timerDuration = Int(newValue)
                                     UserDefaults.standard.set(timerDuration, forKey: "savedTimerDuration")
@@ -301,21 +294,21 @@ struct ContentView: View {
                             
                             DatePicker("First set:", selection: $timeForFirstIso, displayedComponents: [.hourAndMinute])
                                 .datePickerStyle(.compact)
-                                .onChange(of: timeForFirstIso){ oldTime, newTime in
+                                .onChange(of: timeForFirstIso){ newTime in
                                     scheduleFirstIsoNotification(at: newTime)
                                     UserDefaults.standard.set(timeForFirstIso, forKey: "savedTimeForFirstIso")
                                 }
                             
                             DatePicker("Second set:", selection: $timeForSecondIso, displayedComponents: [.hourAndMinute])
                                 .datePickerStyle(.compact)
-                                .onChange(of: timeForSecondIso){ oldTime2, newTime2 in
+                                .onChange(of: timeForSecondIso){ newTime2 in
                                     scheduleSecondIsoNotification(at: newTime2)
                                     UserDefaults.standard.set(timeForSecondIso, forKey: "savedTimeForSecondIso")
                                 }
                             
                             DatePicker("Third set:", selection: $timeForThirdIso, displayedComponents: [.hourAndMinute])
                                 .datePickerStyle(.compact)
-                                .onChange(of: timeForThirdIso){ oldTime3, newTime3 in
+                                .onChange(of: timeForThirdIso){ newTime3 in
                                     scheduleThirdIsoNotification(at: newTime3)
                                     UserDefaults.standard.set(timeForThirdIso, forKey: "savedTimeForThirdIso")
                                 }
@@ -326,7 +319,7 @@ struct ContentView: View {
                             
                             DatePicker("Pain tracking:", selection: $timeForPainTracking, displayedComponents: [.hourAndMinute])
                                 .datePickerStyle(.compact)
-                                .onChange(of: timeForPainTracking){ oldTime3, newTime3 in
+                                .onChange(of: timeForPainTracking){ newTime3 in
                                     schedulePainTrackingNotification(at: newTime3)
                                     UserDefaults.standard.set(timeForPainTracking, forKey: "savedTimeForPainTracking")
                                 }
@@ -364,7 +357,7 @@ struct ContentView: View {
         .onAppear{
             loadData()
         }
-        .onChange(of: selectedTab) {oldTab, newTab in
+        .onChange(of: selectedTab) { newTab in
             if tabSwitchingAllowed == false{
                 selectedTab = 2
             }
