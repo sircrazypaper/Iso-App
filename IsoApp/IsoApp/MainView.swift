@@ -161,6 +161,8 @@ struct ContentView: View {
                             Slider(value: $todaysPainLevel, in: 1...10, step: 1)
                                 .onChange(of: todaysPainLevel) { oldValue, newValue in
                                     painLevelInt = Int(newValue)
+                                    UserDefaults.standard.set(todaysPainLevel, forKey: "savedTodaysPainLevel")
+                                    UserDefaults.standard.set(painLevelInt, forKey: "savedPainLevelInt")
                                 }
                             
                             Text("\(painLevelInt ?? 1)")
@@ -179,6 +181,14 @@ struct ContentView: View {
                             
                         }
                         .padding(20)
+                        .onAppear{
+                            if let savedTodaysPainLevel = UserDefaults.standard.value(forKey: "savedTodaysPainLevel") as? Double{
+                                todaysPainLevel = savedTodaysPainLevel
+                            }
+                            if let savedPainLevelInt = UserDefaults.standard.value(forKey: "savedPainLevelInt") as? Int{
+                                painLevelInt = savedPainLevelInt
+                            }
+                        }
                     
                     VStack {
                         Text("History")
